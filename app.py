@@ -5,7 +5,7 @@ app=Flask(__name__)
 
 @app.route("/",methods=['GET','POST'])
 def index():
-    return "starting machine learing project"
+    return "CI/CD pipeline has been established ml pipeline is left"
 
 
 if __name__=="__main__":
