@@ -6,7 +6,7 @@ from housing.exception import HousingException
 import sys,os
 from housing.logger import logging
 
-class configuration:
+class Configuration:
 
     def __init__(self,config_file_path:str =CONFIG_FILE_PATH,
         current_time_stamp:str = CURRENT_TIME_STAMP)-> None:
@@ -65,7 +65,40 @@ class configuration:
     
 
     def get_data_validation_config(self)-> DataTransformationConfig:
-        pass
+        try:
+            artifact_dir = self.training_pipeline_config.artifact_dir
+
+            data_validation_artifact_dir=os.path.join(
+                artifact_dir,
+                DATA_VALIDATION_ARTIFACT_DIR_NAME,
+                self.time_stamp
+            )
+            data_validation_config = self.config_info[DATA_VALIDATION_CONFIG_KEY]
+
+
+            schema_file_path = os.path.join(ROOT_DIR,
+            data_validation_config[DATA_VALIDATION_SCHEMA_DIR_KEY],
+            data_validation_config[DATA_VALIDATION_SCHEMA_FILE_NAME_KEY]
+            )
+
+            report_file_path = os.path.join(data_validation_artifact_dir,
+            data_validation_config[DATA_VALIDATION_REPORT_FILE_NAME_KEY]
+            )
+
+            report_page_file_path = os.path.join(data_validation_artifact_dir,
+            data_validation_config[DATA_VALIDATION_REPORT_PAGE_FILE_NAME_KEY]
+
+            )
+
+            data_validation_config = DataValidationConfig(
+                schema_file_path=schema_file_path,
+                report_file_path=report_file_path,
+                report_page_file_path=report_page_file_path,
+            )
+            return data_validation_config
+        except Exception as e:
+            raise HousingException(e,sys) from e
+        
 
     def get_data_transformation_config(self)-> DataValidationConfig:
         pass
@@ -79,10 +112,10 @@ class configuration:
     def get_model_pusher_config(self)-> ModelPusherConfig:
         pass
 
-    def get_training_pipeline_config(self)-> TrainingPipelineConfig:
+    def get_training_pipeline_config(self) ->TrainingPipelineConfig:
         try:
             training_pipeline_config = self.config_info[TRAINING_PIPELINE_CONFIG_KEY]
-             artifact_dir = os.path.join(ROOT_DIR,
+            artifact_dir = os.path.join(ROOT_DIR,
             training_pipeline_config[TRAINING_PIPELINE_NAME_KEY],
             training_pipeline_config[TRAINING_PIPELINE_ARTIFACT_DIR_KEY]
             )

@@ -4,12 +4,13 @@ from housing.exception import HousingException
 from housing.logger import logging
 from housing.entity.artifact_entity import DataIngestionArtifact
 import tarfile
+import numpy as np
 from six.moves import urllib
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import StratifiedShuffleSplit
 
-class DataIngestionn:
+class DataIngestion:
+
     def __init__(self,data_ingestion_config:DataIngestionConfig ):
         try:
             logging.info(f"{'>>'*20}Data Ingestion log started.{'<<'*20} ")
@@ -18,16 +19,14 @@ class DataIngestionn:
         except Exception as e:
             raise HousingException(e,sys)
     
-    def download_housing_data(self,)-> str:
-         try:
+
+    def download_housing_data(self,) -> str:
+        try:
             #extraction remote url to download dataset
             download_url = self.data_ingestion_config.dataset_download_url
 
             #folder location to download file
             tgz_download_dir = self.data_ingestion_config.tgz_download_dir
-
-            if os.path.exists(tgz_download_dir):
-                os.remove(tgz_download_dir)
             
             os.makedirs(tgz_download_dir,exist_ok=True)
 
@@ -43,9 +42,8 @@ class DataIngestionn:
         except Exception as e:
             raise HousingException(e,sys) from e
 
-
-    def extract_tgz_file(self,):
-         try:
+    def extract_tgz_file(self,tgz_file_path:str):
+        try:
             raw_data_dir = self.data_ingestion_config.raw_data_dir
 
             if os.path.exists(raw_data_dir):
@@ -60,9 +58,10 @@ class DataIngestionn:
 
         except Exception as e:
             raise HousingException(e,sys) from e
-
-    def split_data_as_train_test(self,)-> DataIngestionArtifact:
-        raw_data_dir = self.data_ingestion_config.raw_data_dir
+    
+    def split_data_as_train_test(self) -> DataIngestionArtifact:
+        try:
+            raw_data_dir = self.data_ingestion_config.raw_data_dir
 
             file_name = os.listdir(raw_data_dir)[0]
 
@@ -119,17 +118,13 @@ class DataIngestionn:
 
     def initiate_data_ingestion(self)-> DataIngestionArtifact:
         try:
-            tgz_file_path = self.download_housing_data()
+            tgz_file_path =  self.download_housing_data()
             self.extract_tgz_file(tgz_file_path=tgz_file_path)
             return self.split_data_as_train_test()
-            
         except Exception as e:
             raise HousingException(e,sys) from e
     
+
+
     def __del__(self):
         logging.info(f"{'>>'*20}Data Ingestion log completed.{'<<'*20} \n\n")
-
-    
-    
-     
-   
