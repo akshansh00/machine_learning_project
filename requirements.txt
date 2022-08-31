@@ -6,4 +6,5 @@ sklearn
 pyYAML
 six
 evidently
+dill
 -e .
